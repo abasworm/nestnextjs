@@ -32,4 +32,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsOptional()
   @IsEnum(IsActive)
   isActive?: string;
+
+  @ApiProperty()
+  modifiedBy: string;
 }

@@ -6,6 +6,7 @@ import { PageOptionsDto } from 'src/common/page-options.dto';
 import { PageDto } from 'src/common/page.dto';
 import { PageMetaDto } from 'src/common/page-meta.dto';
 import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -46,6 +47,35 @@ export class UserRepository extends Repository<User> {
       this.save(userEntity);
     } catch (error) {
       console.error('error: with code 002');
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  async updateUser(uuid: string, updateUserDto: UpdateUserDto): Promise<void> {
+    try {
+      console.log(uuid, updateUserDto);
+      // const { email, password, fullname, isActive, modifiedBy } = updateUserDto;
+
+      const userUpdated = await this.update(
+        {
+          uuid: uuid,
+        },
+        updateUserDto,
+      );
+      console.log(userUpdated.affected);
+    } catch (error) {
+      console.error('error: with code 004', error);
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  async getOneUser(uuid: string): Promise<User> {
+    try {
+      const queryBuilder = this.createQueryBuilder('user');
+      queryBuilder.where('user.uuid = :uuid', { uuid });
+      return await queryBuilder.getOne();
+    } catch (error) {
+      console.error('error: with code 003');
       throw new InternalServerErrorException(error);
     }
   }

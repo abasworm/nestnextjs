@@ -23,12 +23,12 @@ export class UserService {
     return await this.userRepository.getAllUser(pageOptionsDto);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(uuid: string) {
+    return await this.userRepository.getOneUser(uuid);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(uuid: string, updateUserDto: UpdateUserDto) {
+    return await this.userRepository.updateUser(uuid, updateUserDto);
   }
 
   remove(id: number) {
