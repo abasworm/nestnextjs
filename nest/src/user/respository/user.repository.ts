@@ -23,6 +23,7 @@ export class UserRepository extends Repository<User> {
 
   async getAllUser(pageOptionsDto: PageOptionsDto): Promise<PageDto<User>> {
     const queryBuilder = this.userRepository.createQueryBuilder('user');
+    console.log(pageOptionsDto);
     queryBuilder
       .orderBy('user.createdAt', pageOptionsDto.order)
       .skip(pageOptionsDto.skip)
@@ -53,16 +54,25 @@ export class UserRepository extends Repository<User> {
 
   async updateUser(uuid: string, updateUserDto: UpdateUserDto): Promise<void> {
     try {
-      console.log(uuid, updateUserDto);
-      // const { email, password, fullname, isActive, modifiedBy } = updateUserDto;
+      // console.log(uuid, updateUserDto);
+      const { email, password, fullname, isActive, modifiedBy } = updateUserDto;
 
-      const userUpdated = await this.update(
-        {
-          uuid: uuid,
-        },
-        updateUserDto,
-      );
-      console.log(userUpdated.affected);
+      const userEntity = await this.findOneBy({ uuid });
+      if (email) userEntity.email = email;
+      if (password) userEntity.password = password;
+      if (fullname) userEntity.fullname = fullname;
+      if (isActive) userEntity.isActive = isActive;
+      if (modifiedBy) userEntity.modifiedBy = modifiedBy;
+      this.save(userEntity);
+
+      // const userUpdated = await this.update(
+      //   {
+      //     uuid: uuid,
+      //   },
+      //   updateUserDto,
+      // );
+
+      // console.log(userUpdated.affected);
     } catch (error) {
       console.error('error: with code 004', error);
       throw new InternalServerErrorException(error);

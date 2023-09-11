@@ -10,6 +10,7 @@ import {
   ClassSerializerInterceptor,
   Query,
   InternalServerErrorException,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,8 +18,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PageOptionsDto } from 'src/common/page-options.dto';
 import { PageDto } from 'src/common/page.dto';
 import { User } from './entities/user.entity';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
+@ApiBearerAuth()
 @ApiTags('Users')
 @Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -26,6 +29,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
+  @UseGuards(AuthGuard())
   create(@Body() createUserDto: CreateUserDto) {
     try {
       createUserDto.createdBy = 'aris.baskoro@dieboldnixdorf.com';
@@ -48,7 +52,7 @@ export class UserController {
 
   @Patch(':uuid')
   update(@Param('uuid') uuid: string, @Body() updateUserDto: UpdateUserDto) {
-    console.log(uuid);
+    // console.log(uuid);
     return this.userService.update(uuid, updateUserDto);
   }
 

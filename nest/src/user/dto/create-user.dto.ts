@@ -9,7 +9,7 @@ import {
 import { IsActive } from 'src/config/constansts';
 
 export class CreateUserDto {
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty()
   @IsEmail()
   @MaxLength(100)

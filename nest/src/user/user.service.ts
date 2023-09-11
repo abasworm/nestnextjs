@@ -1,10 +1,18 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  HttpStatus,
+  HttpException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PageOptionsDto } from 'src/common/page-options.dto';
 import { User } from './entities/user.entity';
 import { PageDto } from 'src/common/page.dto';
 import { UserRepository } from './respository/user.repository';
+import { LoginUserDto } from './dto/login-user.dto';
+import { compare } from 'bcryptjs';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
@@ -12,6 +20,12 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     try {
+      const userExists = await this.userRepository.findOne({
+        where: { email: createUserDto.email },
+      });
+      if (userExists)
+        throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+
       return await this.userRepository.createUser(createUserDto);
     } catch (error) {
       console.error('error: with code 003');
@@ -29,6 +43,30 @@ export class UserService {
 
   async update(uuid: string, updateUserDto: UpdateUserDto) {
     return await this.userRepository.updateUser(uuid, updateUserDto);
+  }
+
+  async findByLogin(loginUserDto: LoginUserDto): Promise<UserDto> {
+    const user = await this.userRepository.findOne({
+      where: { email: loginUserDto.email },
+    });
+    if (!user)
+      throw new HttpException(
+        'Email of Password Not Found',
+        HttpStatus.UNAUTHORIZED,
+      );
+
+    const match = await compare(loginUserDto.password, user.password);
+    if (!match)
+      throw new HttpException(
+        'Email of Password Not Found',
+        HttpStatus.UNAUTHORIZED,
+      );
+
+    return user;
+  }
+
+  async findByPayload({ email }: any): Promise<UserDto> {
+    return await this.userRepository.findOne({ where: { email } });
   }
 
   remove(id: number) {
