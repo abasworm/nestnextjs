@@ -19,17 +19,18 @@ import { PageOptionsDto } from 'src/common/page-options.dto';
 import { PageDto } from 'src/common/page.dto';
 import { User } from './entities/user.entity';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/decorators/get-user.decorator';
+import { JwtGuard } from 'src/guard/jwt.guard';
 
 @ApiBearerAuth()
 @ApiTags('Users')
 @Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)
+@UseGuards(JwtGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  @UseGuards(AuthGuard())
   create(@Body() createUserDto: CreateUserDto) {
     try {
       createUserDto.createdBy = 'aris.baskoro@dieboldnixdorf.com';
@@ -41,7 +42,11 @@ export class UserController {
   }
 
   @Get()
-  findAll(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<User>> {
+  findAll(
+    @Query() pageOptionsDto: PageOptionsDto,
+    @GetUser() user: User,
+  ): Promise<PageDto<User>> {
+    console.log(user);
     return this.userService.findAll(pageOptionsDto);
   }
 

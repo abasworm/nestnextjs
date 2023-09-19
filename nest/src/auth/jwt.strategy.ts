@@ -11,14 +11,18 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private readonly authService: AuthService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.SECRET_KEY,
+      ignoreEpiration: false,
+      secretOrKey: process.env.SECRET_ACCESS_KEY,
     });
   }
 
   async validate(payload: JwtPayload): Promise<UserDto> {
     const user = await this.authService.validateUser(payload);
     if (!user)
-      throw new HttpException('Invalid Token', HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        `You don't have access to this page (103)`,
+        HttpStatus.UNAUTHORIZED,
+      );
     return user;
   }
 }

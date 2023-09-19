@@ -1,8 +1,9 @@
 import { Exclude } from 'class-transformer';
 import { BasicEntity } from 'src/config/basic.entity';
 import { IsActive } from 'src/config/constansts';
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
 import { hash } from 'bcryptjs';
+import { RefreshToken } from 'src/auth/entity/refresh-token.entity';
 
 @Entity()
 export class User extends BasicEntity {
@@ -14,6 +15,11 @@ export class User extends BasicEntity {
   @Column({ nullable: true, type: 'text' }) login_info: string;
   @Column({ nullable: true, type: 'int', default: 0 }) login_try: number;
   @Column({ length: 2, default: 'N', enum: IsActive }) isActive: string;
+
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user, {
+    eager: true,
+  })
+  refreshToken: RefreshToken[];
 
   @BeforeInsert() async hashPassword() {
     this.password = await hash(this.password, 10);

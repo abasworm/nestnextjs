@@ -1,5 +1,6 @@
 export interface LoginStatus {
   email: string;
-  accessToken: any;
+  accessToken: string;
+  refreshToken: string;
   expiresIn: any;
 }

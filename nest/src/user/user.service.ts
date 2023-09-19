@@ -13,6 +13,7 @@ import { UserRepository } from './respository/user.repository';
 import { LoginUserDto } from './dto/login-user.dto';
 import { compare } from 'bcryptjs';
 import { UserDto } from './dto/user.dto';
+import { JwtPayload } from 'src/auth/interfaces/payload.interface';
 
 @Injectable()
 export class UserService {
@@ -45,7 +46,7 @@ export class UserService {
     return await this.userRepository.updateUser(uuid, updateUserDto);
   }
 
-  async findByLogin(loginUserDto: LoginUserDto): Promise<UserDto> {
+  async findByLogin(loginUserDto: LoginUserDto): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { email: loginUserDto.email },
     });
@@ -65,7 +66,7 @@ export class UserService {
     return user;
   }
 
-  async findByPayload({ email }: any): Promise<UserDto> {
+  async findByPayload({ email, fullname }: JwtPayload): Promise<UserDto> {
     return await this.userRepository.findOne({ where: { email } });
   }
 
