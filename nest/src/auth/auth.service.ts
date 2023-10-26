@@ -46,6 +46,7 @@ export class AuthService {
     const accessToken = await this.createAccessToken(user);
     const refreshToken = await this.createRefreshToken(user);
     return {
+      fullname: user.fullname,
       email: user.email,
       refreshToken,
       ...accessToken,
@@ -64,6 +65,8 @@ export class AuthService {
     const user: JwtPayload = { email, fullname };
     const accessToken = await this.jwtService.signAsync(user);
     return {
+      email,
+      fullname,
       expiresIn,
       accessToken,
     };
